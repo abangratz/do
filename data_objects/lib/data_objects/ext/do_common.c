@@ -237,6 +237,11 @@ VALUE data_objects_parse_date_time(const char *date) {
   fmt_datetime = strchr(date, '.') ? _fmt_datetime_tz_subsec : _fmt_datetime_tz_normal;
   tokens_read  = sscanf(date, fmt_datetime, &year, &month, &day, &hour, &min, &sec, &hour_offset, &minute_offset);
 
+  /* MySQL DateTime can return 0 date instead of NULL */
+  if ((year + month + day + hour + min + sec) == 0) {
+    return Qnil;
+  }
+
   switch (tokens_read) {
     case 8:
       minute_offset *= hour_offset < 0 ? -1 : 1;
